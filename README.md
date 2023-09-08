@@ -4,7 +4,9 @@ Quick and dirty script to list all the python installations and virtual environm
 
 Just trying to understand this mess ...though of course that potentially includes understanding all project managers think about this too :)
 
+
 ## Example output
+
 ```
 # find-py-versions
     3.8.10    venv or virtualenv      '/data/coding/envtests/venv'
