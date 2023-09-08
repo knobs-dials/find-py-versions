@@ -5,12 +5,16 @@ Quick and dirty script to list all the python installations and virtual environm
 Just trying to understand this mess ...though of course that potentially includes understanding all project managers think about this too :)
 
 
+Uses `locate` to not have to scan your filesystem every time, so you may want to `updatedb` if you want it to be up to date
+
+
 ## Example output
 
 ```
 # find-py-versions
     3.8.10    venv or virtualenv      '/data/coding/envtests/venv'
     3.8.10    venv or virtualenv      '/data/coding/envtests/virtualenv'
+    3.8.10    venv or virtualenv      '/data/coding/LOOKAT/proj/.venv'
     3.8.10                 pyenv      '/root/.pyenv/versions/3.8.10'
     3.9.16                 pyenv      '/root/.pyenv/versions/3.9/envs/NAME'
     3.9.16                 pyenv      '/root/.pyenv/versions/3.9.16'
