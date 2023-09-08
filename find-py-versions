@@ -1,0 +1,99 @@
+#!/usr/bin/python3
+
+import subprocess, re, os, sys, json
+""" Quick and dirty script to try to find all python installations and virtual environments
+
+    Outputs human-readable to stderr, JSON to stdout 
+"""
+
+# there is the question 'what even do you call a python installation?'
+# a pragmatic answer is something with the combination
+#  PREFIX/bin/pythonVERSION
+#  PREFIX/lib/pythonVERSION/
+# and report (PREFIX,VERSION)
+
+# note that that would probably exclude the local packages in .local/lib/pythonVERSION 
+# TODO: report those too
+
+# To look at:
+#  pyenv versions / pyenv virtualenvs
+#  things like pipsi and pew just seem to wrap venvs (in ~/.local/share/virtualenvs?)
+
+
+p = subprocess.Popen("locate /lib/python", shell=True, stdout=subprocess.PIPE, encoding='utf8')
+
+
+def dirty_parse_cfg(path):
+    ret = {}
+    with open(path, 'r', encoding='utf8') as f:
+        for line in f:
+            if '=' in line:
+                k,v = line.split('=')
+                ret[ k.strip() ] = v.strip()
+    return ret
+
+
+uniq = {}
+localmaybe = {}
+
+out, err = p.communicate()
+for path in out.splitlines():
+    m = re.search(r'((.*)/lib/python([23](?:.[0-9]+)?))', path)
+    if m is not None:
+        libdir, prefix, version = m.groups()
+        if (prefix,version) in uniq:
+            continue # avoid some IO
+
+        if os.path.exists( os.path.join( prefix, 'bin', 'python'+version) ):
+            inst = {'version':version, 'path':prefix}
+
+            # this isn't guaranteed to work, but is useful if it does
+            # also this feels potentially injection sensitive
+
+            try:
+                p = subprocess.Popen(["%s/bin/python%s"%(prefix, version), "-V"], shell=False, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, encoding='utf8')
+                out, err = p.communicate()
+                if 'Python' in out:
+                    #print( out )
+                    inst['version_V'] = out.split(' ',1)[1].strip()
+            except Exception as e: # TODO: be more specific, also because e.g. FileNotFoundError means it's not a real installation
+                print("ERROR: %s"%e)
+            
+            if '/.pyenv/' in path:
+                inst['virtual']='pyenv'
+            elif os.path.exists( os.path.join( prefix, 'pyvenv.cfg') ):
+                inst['virtual']='venv or virtualenv'
+                #inst['virtual_details'] = dirty_parse_cfg( os.path.join( prefix, 'pyvenv.cfg') )
+
+            # dist-packages is only a debian/ubuntu convention, that would probably only apply to system installs
+            distdir = os.path.join( prefix, 'lib', 'python%s'%version, 'dist-packages')
+            if os.path.exists( distdir ): 
+                inst['has-dist']   = True
+                #inst['dist-size'] = len( os.listdir( distdir ) ) # helps separate the system-one-you-install-most-things-into  TODO: filter dirs?    
+                
+
+            sys.stderr.write( "%10s  %20s      %r\n"%(
+                inst.get('version_V',inst.get('version')), 
+                inst.get('virtual',''),
+                prefix,
+            ))
+            sys.stderr.flush()
+            uniq[(prefix,version)] = inst
+
+        else: # lib without bin - assume it's  /usr/local or ~/.local ?
+            # the thing is that conda seems to do this _per package_ which gets spammy fast.
+            # if libdir not in localmaybe:
+            #     if '.local' in path: # so currently hardcoded to only let in what is probably ~/.local 
+            #         print( 'LOCAL', libdir )
+            #     else:
+            #         pass
+            #         #print( 'LOCAL?', libdir )
+            localmaybe[libdir] = True
+    
+    #else:
+    #    print("??? %r"%path)
+
+print( json.dumps( list(uniq.values()) ) )
+#import pprint
+#pprint.pprint( list(uniq.values()) )
+#pprint.pprint(  )
