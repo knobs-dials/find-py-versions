@@ -2,11 +2,10 @@
 
 Quick and dirty script to list all the python installations and virtual environments I can find.
 
-Just trying to understand this mess ...though of course that potentially includes understanding all project managers think about this too :)
-
-
 Uses `locate` to not have to scan your filesystem every time, so you may want to `updatedb` if you want it to be up to date
 
+
+Just trying to understand this mess ...though of course that potentially includes understanding all project managers think about this too :)
 
 ## Example output
 
@@ -47,7 +46,5 @@ Uses `locate` to not have to scan your filesystem every time, so you may want to
      3.6.7                            '/var/lib/docker/overlay2/7a012ee7709ba569a1593bfa437bda6788b48f1d164ed6f0c5be66aa04bf10ea/merged/usr'
     3.8.10                            '/var/lib/docker/overlay2/a45cc113204a81d8895a74abc35a31a7b9c855873bfdeae9cad538683743d224/diff/usr'
 ```
-
-Yup, not confusing at all.
 
 
