@@ -2,7 +2,9 @@
 
 Quick and dirty script to list all the python installations and virtual environments I can find.
 
-Uses `locate` to not have to scan your filesystem every time, so you may want to `updatedb` if you want it to be up to date
+Uses `locate` to not have to scan your filesystem every time, so 
+* won't work on installs without it installed, e.g. containers, some slimmed down server setups
+* you may want to `updatedb` if you want it to be up to date
 
 
 Just trying to understand this mess ...though of course that potentially includes understanding all project managers think about this too :)
