@@ -2,7 +2,8 @@
 
 Quick and dirty script to list all the python installations and virtual environments I can find.
 
-Just trying to understand this mess ...though of course that potentially includes understanding all project/package managers think about this too...
+Made in an effort understand the unholy mess that is python packaging.
+Because I am, apparently, a masochist.
 
 
 Uses `locate` to not have to scan your filesystem every time, so 
